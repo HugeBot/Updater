@@ -18,9 +18,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("com.squareup.okhttp3:okhttp:4.9.0")
-    implementation("commons-cli:commons-cli:1.3.1")
-    implementation("org.kohsuke:github-api:1.101")
+    implementation("org.kohsuke:github-api:1.117")
 }
 
 tasks.withType<KotlinCompile> {
