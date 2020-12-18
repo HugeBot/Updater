@@ -40,7 +40,7 @@ class Updater(
         if (assets.isEmpty()) throw IllegalStateException("Release returned 0 assets.")
         println("Assets found: ${assets.joinToString(" ") { it.name }}")
 
-        print("Downloading ${assets[0].name} (${assets[0].id})...")
+        println("Downloading ${assets[0].name} (${assets[0].id})...")
         val url = URL("https://api.github.com/repos/Blad3Mak3r/HUGE/releases/assets/${assets[0].id}")
         val connection = url.openConnection() as HttpsURLConnection
         connection.setRequestProperty("Accept", "application/octet-stream")
