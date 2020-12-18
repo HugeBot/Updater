@@ -3,6 +3,7 @@ package net.hugebot
 import org.kohsuke.github.GitHubBuilder
 import org.kohsuke.github.RateLimitHandler
 import java.io.FileOutputStream
+import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.lang.RuntimeException
 import java.net.URL
@@ -11,14 +12,18 @@ import java.util.*
 import javax.net.ssl.HttpsURLConnection
 
 class Updater(
-    private val githubToken: String,
+    private val args: Array<String>,
     private val process: Optional<ProcessHandle>?
 ) {
+
+    private val githubToken: String = args[0]
+    private val repoName: String = args[1].takeIf { it.contains("/") } ?: throw IllegalArgumentException("Repo name does not contains / .")
+    private val fileName: String = args[2].takeIf { it.endsWith(".jar") } ?: throw IllegalArgumentException("File name must end with .jar")
 
     fun update() {
         if (process == null) return doUpdate()
 
-        if (process.isPresent && process.get().isAlive) throw RuntimeException("Huge process is alive.")
+        if (process.isPresent && process.get().isAlive) throw RuntimeException("$fileName process is alive with pid ${process.get().pid()}.")
 
         doUpdate()
     }
@@ -33,15 +38,16 @@ class Updater(
             .withRateLimitHandler(RateLimitHandler.WAIT)
             .build()
 
-        val repo = api.getRepository("Blad3Mak3r/HUGE")
+        val repo = api.getRepository(repoName)
 
         println("Fetching assets...")
-        val assets = repo.latestRelease.assets.filter { it.name == "Huge.jar" }
+        val assets = repo.latestRelease.listAssets().filter { it.name == fileName }
         if (assets.isEmpty()) throw IllegalStateException("Release returned 0 assets.")
         println("Assets found: ${assets.joinToString(" ") { it.name }}")
 
-        println("Downloading ${assets[0].name} (${assets[0].id})...")
-        val url = URL("https://api.github.com/repos/Blad3Mak3r/HUGE/releases/assets/${assets[0].id}")
+        val artifact = assets[0]
+        println("Downloading ${artifact.name} id(${assets[0].id}) [${artifact.owner.fullName}]...")
+        val url = URL("https://api.github.com/repos/Blad3Mak3r/HUGE/releases/assets/${artifact.id}")
         val connection = url.openConnection() as HttpsURLConnection
         connection.setRequestProperty("Accept", "application/octet-stream")
         connection.setRequestProperty("Authorization", "token ${props.getProperty("oauth")}")
@@ -53,7 +59,7 @@ class Updater(
         fileOutputStream.close()
         fileChannel.close()
 
-        if (connection.responseCode == 200) println("Se ha descargado la última versión de Huge.")
-        else println("No se ha podido descargar la nueva versión de Huge... ${connection.responseMessage}")
+        if (connection.responseCode == 200) println("Artifact downloaded successfully.")
+        else println("The artifact could not be downloaded. ${connection.responseMessage}")
     }
 }
