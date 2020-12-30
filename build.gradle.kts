@@ -34,7 +34,7 @@ tasks {
         manifest {
             attributes(mapOf("Main-Class" to "net.hugebot.MainKt"))
         }
-        archiveBaseName.set("HugeUpdater")
+        archiveBaseName.set("Updater")
         archiveClassifier.set("")
         archiveVersion.set("")
     }

@@ -52,7 +52,7 @@ class Updater(
         connection.setRequestProperty("Accept", "application/octet-stream")
         connection.setRequestProperty("Authorization", "token ${props.getProperty("oauth")}")
         val channel = Channels.newChannel(connection.inputStream)
-        val fileOutputStream = FileOutputStream("Huge.jar")
+        val fileOutputStream = FileOutputStream(fileName)
         val fileChannel = fileOutputStream.channel
         fileChannel.transferFrom(channel, 0, Long.MAX_VALUE)
         channel.close()
