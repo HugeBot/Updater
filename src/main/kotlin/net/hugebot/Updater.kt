@@ -47,7 +47,7 @@ class Updater(
 
         val artifact = assets[0]
         println("Downloading ${artifact.name} id(${assets[0].id}) [${artifact.owner.fullName}]...")
-        val url = URL("https://api.github.com/repos/Blad3Mak3r/HUGE/releases/assets/${artifact.id}")
+        val url = URL("https://api.github.com/repos/$repoName/releases/assets/${artifact.id}")
         val connection = url.openConnection() as HttpsURLConnection
         connection.setRequestProperty("Accept", "application/octet-stream")
         connection.setRequestProperty("Authorization", "token ${props.getProperty("oauth")}")
